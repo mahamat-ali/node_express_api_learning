@@ -1,20 +1,18 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+import express from "express";
+import { PORT, NODE_ENV } from "./config/env.js";
+import connectToDatabase from "./database/mongodb.js";
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
+import subscriptionRouter from "./routes/subscription.routes.js";
 
-var app = express();
+const app = express();
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/subscriptions", subscriptionRouter);
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-module.exports = app;
+app.listen(PORT, async () => {
+  console.log(`Subscription tracker running on http://localhost:${PORT}`);
+  await connectToDatabase();
+});
